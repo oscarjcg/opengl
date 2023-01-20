@@ -39,6 +39,11 @@ void Camera::keyControl(bool* keys, GLfloat deltaTime)
 	{
 		position += right * velocity;
 	}
+
+	if (keys[GLFW_MOUSE_BUTTON_1])
+	{
+		printf("Mouse left\n");
+	}
 }
 
 void Camera::mouseControl(GLfloat xChange, GLfloat yChange)

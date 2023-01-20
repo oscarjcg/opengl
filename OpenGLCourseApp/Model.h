@@ -10,6 +10,9 @@
 #include "Mesh.h"
 #include "Texture.h"
 
+#include <glm\glm.hpp>
+#include <glm\gtc\matrix_transform.hpp>
+
 class Model
 {
 public:
@@ -18,6 +21,12 @@ public:
 	void LoadModel(const std::string& fileName);
 	void RenderModel();
 	void ClearModel();
+
+	void Translate(glm::vec3 values);
+	void Rotate(float angle, glm::vec3 values);
+	void Scale(glm::vec3 values);
+	void SetModel(glm::mat4 value);
+	glm::mat4 GetModel();
 
 	~Model();
 
@@ -30,5 +39,6 @@ private:
 	std::vector<Mesh*> meshList;
 	std::vector<Texture*> textureList;
 	std::vector<unsigned int> meshToTex;
+	glm::mat4 model;
 };
 

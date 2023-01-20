@@ -2,6 +2,8 @@
 
 Model::Model()
 {
+	// TODO Not working
+	model = glm::mat4(1.0f);
 }
 
 void Model::RenderModel()
@@ -139,6 +141,32 @@ void Model::ClearModel()
 			textureList[i] = nullptr;
 		}
 	}
+}
+
+void Model::Translate(glm::vec3 values)
+{
+	//model = glm::mat4(1.0f);
+	model = glm::translate(model, values);
+}
+
+void Model::Rotate(float angle, glm::vec3 values)
+{
+	model = glm::rotate(model, angle, values);
+}
+
+void Model::Scale(glm::vec3 values)
+{
+	model = glm::scale(model, values);
+}
+
+void Model::SetModel(glm::mat4 value)
+{
+	model = value;
+}
+
+glm::mat4 Model::GetModel()
+{
+	return model;
 }
 
 Model::~Model()

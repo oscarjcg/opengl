@@ -17,7 +17,7 @@ public:
 		GLuint diffuseIntensityLocation, GLuint positionLocation, GLuint directionLocation,
 		GLuint constantLocation, GLuint linearLocation, GLuint exponentLocation,
 		GLuint edgeLocation);
-
+	
 	void SetFlash(glm::vec3 pos, glm::vec3 dir);
 
 	~SpotLight();

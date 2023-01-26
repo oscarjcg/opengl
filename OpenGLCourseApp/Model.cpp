@@ -4,6 +4,10 @@ Model::Model()
 {
 	// TODO Not working
 	model = glm::mat4(1.0f);
+	type = MODEL_ENVIRONMENT;
+	position = glm::vec3(0.0f, 0.0f, -1.0f);
+	direction = glm::vec3(0.0f, 0.0f, -1.0f);
+	moveSpeed = 1.0f;
 }
 
 void Model::RenderModel()
@@ -122,6 +126,7 @@ void Model::LoadMaterials(const aiScene * scene)
 	}
 }
 
+
 void Model::ClearModel()
 {
 	for (size_t i = 0; i < meshList.size(); i++)
@@ -162,11 +167,49 @@ void Model::Scale(glm::vec3 values)
 void Model::SetModel(glm::mat4 value)
 {
 	model = value;
+	type = MODEL_BULLET;
+}
+
+void Model::SetType(int t)
+{
+	type = t;
 }
 
 glm::mat4 Model::GetModel()
 {
 	return model;
+}
+
+void Model::Update(GLfloat deltaTime)
+{
+	double eps = (moveSpeed * deltaTime) /
+		(sqrt(pow(static_cast<double>(direction.x), 2) +
+			pow(static_cast<double>(direction.y), 2) +
+			pow(static_cast<double>(direction.z), 2))
+			);
+
+	float x = position.x + (eps * direction.x);
+	float y = position.y + (eps * direction.y);
+	float z = position.z + (eps * direction.z);
+	glm::vec3 newPos = glm::vec3(x, y, z);
+	position = newPos;
+
+	model = glm::mat4(1.0f);
+	if (type == MODEL_BULLET)
+		Translate(newPos);
+
+	collider->SetPosition(newPos);
+	collider->CalculateLimits();
+}
+
+
+
+void Model::SetCollider(float sizeX, float sizeY, float sizeZ)
+{
+	AABBCollider* collider = new AABBCollider();
+	collider->SetPosition(position);
+	collider->SetSize(sizeX, sizeY, sizeZ);
+	this->collider = collider;
 }
 
 Model::~Model()

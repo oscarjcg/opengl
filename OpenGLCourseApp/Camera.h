@@ -6,6 +6,8 @@
 #include <glm\gtc\matrix_transform.hpp>
 
 #include <GLFW\glfw3.h>
+#include "GameControllerActions.h"
+
 
 class Camera
 {
@@ -15,7 +17,7 @@ public:
 		GLfloat startMoveSpeed, GLfloat startTurnSpeed);
 
 	void keyControl(bool* keys, GLfloat deltaTime);
-	void mouseControl(GLfloat xChange, GLfloat yChange);
+	void mouseControl(GameControllerActions* actions, bool* keys, bool* keysConsumed, GLfloat xChange, GLfloat yChange);
 
 	glm::vec3 getCameraPosition();
 	glm::vec3 getCameraDirection();

@@ -9,6 +9,16 @@ Window::Window()
 	{
 		keys[i] = 0;
 	}
+
+	for (size_t i = 0; i < 16; i++)
+	{
+		keysMouse[i] = 0;
+	}
+
+	for (size_t i = 0; i < 16; i++)
+	{
+		keysConsumedMouse[i] = 0;
+	}
 	
 	xChange = 0.0f;
 	yChange = 0.0f;
@@ -22,6 +32,16 @@ Window::Window(GLint windowWidth, GLint windowHeight)
 	for (size_t i = 0; i < 1024; i++)
 	{
 		keys[i] = 0;
+	}
+
+	for (size_t i = 0; i < 16; i++)
+	{
+		keysMouse[i] = 0;
+	}
+
+	for (size_t i = 0; i < 16; i++)
+	{
+		keysConsumedMouse[i] = 0;
 	}
 	
 	xChange = 0.0f;
@@ -89,6 +109,7 @@ void Window::createCallbacks()
 {
 	glfwSetKeyCallback(mainWindow, handleKeys);
 	glfwSetCursorPosCallback(mainWindow, handleMouse);
+	glfwSetMouseButtonCallback(mainWindow, handleMouseButtons);
 }
 
 GLfloat Window::getXChange()
@@ -143,6 +164,24 @@ void Window::handleMouse(GLFWwindow* window, double xPos, double yPos)
 
 	theWindow->lastX = xPos;
 	theWindow->lastY = yPos;
+}
+
+void Window::handleMouseButtons(GLFWwindow* window, int button, int action, int mods)
+{
+	Window* theWindow = static_cast<Window*>(glfwGetWindowUserPointer(window));
+
+	if (button >= 0 && button < 16)
+	{
+		if (action == GLFW_PRESS)
+		{
+			theWindow->keysMouse[button] = true;
+		}
+		else if (action == GLFW_RELEASE)
+		{
+			theWindow->keysMouse[button] = false;
+			theWindow->keysConsumedMouse[button] = false;
+		}
+	}
 }
 
 Window::~Window()

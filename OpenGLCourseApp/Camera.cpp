@@ -40,13 +40,10 @@ void Camera::keyControl(bool* keys, GLfloat deltaTime)
 		position += right * velocity;
 	}
 
-	if (keys[GLFW_MOUSE_BUTTON_1])
-	{
-		printf("Mouse left\n");
-	}
 }
 
-void Camera::mouseControl(GLfloat xChange, GLfloat yChange)
+void Camera::mouseControl(GameControllerActions* actions, 
+	bool* keys, bool* keysConsumed, GLfloat xChange, GLfloat yChange)
 {
 	xChange *= turnSpeed;
 	yChange *= turnSpeed;
@@ -63,6 +60,16 @@ void Camera::mouseControl(GLfloat xChange, GLfloat yChange)
 	{
 		pitch = -89.0f;
 	}
+	
+	
+	if (keys[GLFW_MOUSE_BUTTON_LEFT] && !keysConsumed[GLFW_MOUSE_BUTTON_LEFT])
+	{
+		printf("GLFW_MOUSE_BUTTON_LEFT \n");
+		keysConsumed[GLFW_MOUSE_BUTTON_LEFT] = true;
+
+		actions->Shoot();
+	}
+	
 
 	update();
 }
@@ -74,7 +81,7 @@ glm::mat4 Camera::calculateViewMatrix()
 
 glm::vec3 Camera::getCameraPosition()
 {
-	return position;
+	return position;	
 }
 glm::vec3 Camera::getCameraDirection()
 {

@@ -23,23 +23,21 @@
 #include "PointLight.h"
 #include "SpotLight.h"
 #include "Material.h"
+#include "GameController.h"
 
 #include "Model.h"
 
-const float toRadians = 3.14159265f / 180.0f;
+
 
 Window mainWindow;
 std::vector<Shader> shaderList;
-std::vector<Model*> models;
-Camera camera;
+
+GameController gameController;
 
 Material shinyMaterial;
 Material dullMaterial;
 
-Model xwing;
-Model blackhawk;
-Model floorModel;
-Model bulletModel;
+
 
 DirectionalLight mainLight;
 PointLight pointLights[MAX_POINT_LIGHTS];
@@ -60,42 +58,9 @@ static const char* fShader = "Shaders/shader.frag";
 
 void CreateObjects() 
 {
-	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 5.0f, 0.5f);
 
 	shinyMaterial = Material(4.0f, 256);
 	dullMaterial = Material(0.3f, 4);
-
-	xwing = Model();
-	xwing.LoadModel("Models/x-wing.obj");
-	xwing.SetModel(glm::mat4(1.0f));
-	xwing.Translate(glm::vec3(-7.0f, 0.0f, 10.0f));
-	xwing.Scale(glm::vec3(0.006f, 0.006f, 0.006f));
-
-	blackhawk = Model();
-	blackhawk.LoadModel("Models/uh60.obj");
-	blackhawk.SetModel(glm::mat4(1.0f));
-	blackhawk.Translate(glm::vec3(-3.0f, 2.0f, 0.0f));
-	blackhawk.Rotate(-90.0f * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
-	blackhawk.Scale(glm::vec3(0.4f, 0.4f, 0.4f));
-
-	floorModel = Model();
-	floorModel.LoadModel("Models/floor.obj");
-	floorModel.SetModel(glm::mat4(1.0f));
-	floorModel.Translate(glm::vec3(-1.0f, -1.0f, 0.0f));
-	//floorModel.Rotate(-90.0f * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
-	//floorModel.Scale(glm::vec3(0.4f, 0.4f, 0.4f));
-
-	bulletModel = Model();
-	bulletModel.LoadModel("Models/Bullet.obj");
-	bulletModel.SetModel(glm::mat4(1.0f));
-	bulletModel.Translate(glm::vec3(-5.0f, 0.0f, 0.0f));
-	//bulletModel.Scale(glm::vec3(2000.0f, 2000.0f, 2000.0f));
-
-	//models.push_back(&xwing);
-	//models.push_back(&blackhawk);
-	models.push_back(&floorModel);
-	models.push_back(&bulletModel);
-	
 }
 
 void CreateLights()
@@ -142,7 +107,13 @@ void CreateShaders()
 {
 	Shader *shader1 = new Shader();
 	shader1->CreateFromFiles(vShader, fShader);
+
+	Shader* shader2 = new Shader();
+	//shader2->CreateFromFiles("Shaders/line_shader.vert", "Shaders/line_shader.frag");
+	shader2->CreateFromFiles(vShader, fShader);
+
 	shaderList.push_back(*shader1);
+	shaderList.push_back(*shader2);
 }
 
 int main() 
@@ -150,11 +121,15 @@ int main()
 	mainWindow = Window(1366, 768); // 1280, 1024 or 1024, 768
 	mainWindow.Initialise();
 
+	gameController.init();
+	Camera camera;
+	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 5.0f, 0.5f);
+	gameController.setCamera(&camera);
 	
-	CreateShaders();
+	
 	CreateObjects();
 	CreateLights();
-	
+	CreateShaders();
 
 	GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0, uniformEyePosition = 0,
 		uniformSpecularIntensity = 0, uniformShininess = 0;
@@ -172,8 +147,11 @@ int main()
 
 
 		camera.keyControl(mainWindow.getsKeys(), deltaTime);
-		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange());
+		camera.mouseControl(&gameController, 
+			mainWindow.getsMouseKeys(), mainWindow.getsMouseKeysConsumed(),
+			mainWindow.getXChange(), mainWindow.getYChange());
 
+		gameController.update(deltaTime);
 
 		// Clear the window
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -191,21 +169,61 @@ int main()
 		lowerLight.y -= 0.3f;
 		//spotLights[0].SetFlash(lowerLight, camera.getCameraDirection());
 
+		
 		shaderList[0].SetDirectionalLight(&mainLight);
+		/*
 		shaderList[0].SetPointLights(pointLights, pointLightCount);
 		shaderList[0].SetSpotLights(spotLights, spotLightCount);
+		*/
 
+		glm::mat4 viewMatrix = camera.calculateViewMatrix();
 		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
-		glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.calculateViewMatrix()));
+		glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
 		glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
 
-		for (size_t i = 0; i < models.size(); i++)
+		std::vector<Model*> models = gameController.getModels();
+		for (size_t i = 0; i < 1; i++)
 		{
+			models[i]->Update(deltaTime);
 			glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(models[i]->GetModel()));
-			shinyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+			//shinyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
 			models[i]->RenderModel();
 		}
 
+
+	// ------------------------------------------------
+
+		shaderList[1].UseShader();
+		uniformModel = shaderList[1].GetModelLocation();
+		uniformProjection = shaderList[1].GetProjectionLocation();
+		uniformView = shaderList[1].GetViewLocation();
+		uniformEyePosition = shaderList[1].GetEyePositionLocation();
+		uniformSpecularIntensity = shaderList[1].GetSpecularIntensityLocation();
+		uniformShininess = shaderList[1].GetShininessLocation();
+
+		//glm::vec3 lowerLight = camera.getCameraPosition();
+		//lowerLight.y -= 0.3f;
+		//spotLights[0].SetFlash(lowerLight, camera.getCameraDirection());
+
+		
+		shaderList[1].SetDirectionalLight(&mainLight);
+		/*
+		shaderList[1].SetPointLights(pointLights, pointLightCount);
+		shaderList[1].SetSpotLights(spotLights, spotLightCount);
+		*/
+
+		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
+		glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+		glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
+		
+		for (size_t i = 1; i < models.size(); i++)
+		{
+			models[i]->Update(deltaTime);
+			glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(models[i]->GetModel()));
+			//shinyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+			models[i]->RenderModel();
+		}
+		
 
 		glUseProgram(0);
 

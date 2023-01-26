@@ -13,6 +13,10 @@
 #include <glm\glm.hpp>
 #include <glm\gtc\matrix_transform.hpp>
 
+#include "CommonValues.h"
+#include <math.h>
+#include "AABBCollider.h"
+
 class Model
 {
 public:
@@ -26,7 +30,15 @@ public:
 	void Rotate(float angle, glm::vec3 values);
 	void Scale(glm::vec3 values);
 	void SetModel(glm::mat4 value);
+	void SetType(int t);
 	glm::mat4 GetModel();
+	void Update(GLfloat deltaTime);
+	void SetDirection(glm::vec3 dir) { direction = dir; }
+	void SetPosition(glm::vec3 pos) { position = pos; }
+	glm::vec3 GetPosition() { return position; }
+	void SetMoveSpeed(GLfloat speed) { moveSpeed = speed; }
+	void SetCollider(float sizeX, float sizeY, float sizeZ);
+	AABBCollider* GetCollider() { return collider; }
 
 	~Model();
 
@@ -36,9 +48,16 @@ private:
 	void LoadMesh(aiMesh *mesh, const aiScene *scene);
 	void LoadMaterials(const aiScene *scene);
 
+
 	std::vector<Mesh*> meshList;
 	std::vector<Texture*> textureList;
 	std::vector<unsigned int> meshToTex;
+	AABBCollider* collider;
+
 	glm::mat4 model;
+	glm::vec3 position;
+	glm::vec3 direction;
+	GLfloat moveSpeed;
+	int type;
 };
 

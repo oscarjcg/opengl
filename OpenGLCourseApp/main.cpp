@@ -26,18 +26,23 @@
 #include "GameController.h"
 
 #include "Model.h"
+#include "SimpleShader.h"
+#include "Triangule.h"
+#include "Line.h"
 
 
 
 Window mainWindow;
 std::vector<Shader> shaderList;
+SimpleShader* simpleShader;
 
 GameController gameController;
 
 Material shinyMaterial;
 Material dullMaterial;
 
-
+Triangule* triangule;
+Line* line;
 
 DirectionalLight mainLight;
 PointLight pointLights[MAX_POINT_LIGHTS];
@@ -55,12 +60,47 @@ static const char* vShader = "Shaders/shader.vert";
 // Fragment Shader
 static const char* fShader = "Shaders/shader.frag";
 
+float triOffset2 = 0.0f;
+
 
 void CreateObjects() 
 {
 
 	shinyMaterial = Material(4.0f, 256);
 	dullMaterial = Material(0.3f, 4);
+
+	triangule = new Triangule();
+	unsigned int indices[] = {
+		0, 3, 1,
+		1, 3, 2,
+		2, 3, 0,
+		0, 1, 2
+	};
+
+	GLfloat vertices[] = {
+		-1.0f, -1.0f, 0.0f,
+		0.0f, -1.0f, 1.0f,
+		1.0f, -1.0f, 0.0f,
+		0.0f, 1.0f, 0.0f
+	};
+	triangule->Create(vertices, indices, sizeof(vertices), sizeof(indices));
+
+	line = new Line();
+	GLfloat lineVertices[] = {
+		0.0f, 0.0f, 0.0f,
+		10.0f, 0.0f, 0.0f,
+		0.0f, 10.0f, 0.0f,
+		0.0f, 0.0f, 10.0f
+	};
+
+	unsigned int lineIndices[] = {
+		0, 1,
+		0, 2,
+		0, 3,
+	};
+	
+	line->Create(lineVertices, lineIndices, sizeof(lineVertices), sizeof(lineIndices));
+	line->SetColor(glm::vec3(0.0f, 0.0f, 1.0f));
 }
 
 void CreateLights()
@@ -108,12 +148,15 @@ void CreateShaders()
 	Shader *shader1 = new Shader();
 	shader1->CreateFromFiles(vShader, fShader);
 
-	Shader* shader2 = new Shader();
+	//Shader* shader2 = new Shader();
 	//shader2->CreateFromFiles("Shaders/line_shader.vert", "Shaders/line_shader.frag");
-	shader2->CreateFromFiles(vShader, fShader);
+	//shader2->CreateFromFiles(vShader, fShader);
 
 	shaderList.push_back(*shader1);
-	shaderList.push_back(*shader2);
+	//shaderList.push_back(*shader2);
+
+	simpleShader = new SimpleShader();
+	simpleShader->CreateFromFiles("Shaders/simple_shader.vert", "Shaders/simple_shader.frag");
 }
 
 int main() 
@@ -126,13 +169,14 @@ int main()
 	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 5.0f, 0.5f);
 	gameController.setCamera(&camera);
 	
-	
 	CreateObjects();
 	CreateLights();
 	CreateShaders();
+	
 
 	GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0, uniformEyePosition = 0,
 		uniformSpecularIntensity = 0, uniformShininess = 0;
+	GLuint uniformColor = 0;
 	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (GLfloat)mainWindow.getBufferWidth() / mainWindow.getBufferHeight(), 0.1f, 100.0f);
 
 	// Loop until window closed
@@ -171,10 +215,9 @@ int main()
 
 		
 		shaderList[0].SetDirectionalLight(&mainLight);
-		/*
 		shaderList[0].SetPointLights(pointLights, pointLightCount);
 		shaderList[0].SetSpotLights(spotLights, spotLightCount);
-		*/
+		
 
 		glm::mat4 viewMatrix = camera.calculateViewMatrix();
 		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
@@ -182,48 +225,40 @@ int main()
 		glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
 
 		std::vector<Model*> models = gameController.getModels();
-		for (size_t i = 0; i < 1; i++)
+		for (size_t i = 0; i < models.size(); i++)
 		{
 			models[i]->Update(deltaTime);
 			glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(models[i]->GetModel()));
-			//shinyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+			shinyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
 			models[i]->RenderModel();
 		}
 
 
-	// ------------------------------------------------
+		simpleShader->UseShader();
 
-		shaderList[1].UseShader();
-		uniformModel = shaderList[1].GetModelLocation();
-		uniformProjection = shaderList[1].GetProjectionLocation();
-		uniformView = shaderList[1].GetViewLocation();
-		uniformEyePosition = shaderList[1].GetEyePositionLocation();
-		uniformSpecularIntensity = shaderList[1].GetSpecularIntensityLocation();
-		uniformShininess = shaderList[1].GetShininessLocation();
+		uniformModel = simpleShader->GetModelLocation();
+		uniformProjection = simpleShader->GetProjectionLocation();
+		uniformView = simpleShader->GetViewLocation();
 
-		//glm::vec3 lowerLight = camera.getCameraPosition();
-		//lowerLight.y -= 0.3f;
-		//spotLights[0].SetFlash(lowerLight, camera.getCameraDirection());
+		glm::mat4 model(1.0f);
+		model = glm::mat4(1.0f);
 
-		
-		shaderList[1].SetDirectionalLight(&mainLight);
-		/*
-		shaderList[1].SetPointLights(pointLights, pointLightCount);
-		shaderList[1].SetSpotLights(spotLights, spotLightCount);
-		*/
+		model = glm::translate(model, glm::vec3(triOffset2, 2.0f, -2.5f));
+		model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
 
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
 		glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
-		glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
-		
-		for (size_t i = 1; i < models.size(); i++)
-		{
-			models[i]->Update(deltaTime);
-			glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(models[i]->GetModel()));
-			//shinyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-			models[i]->RenderModel();
-		}
-		
+		glUniform3fv(uniformColor, 1, &glm::vec3(1.0f, 0.0f, 0.0f)[0]);
+
+		triangule->Render();
+
+		model = glm::mat4(1.0f);
+		uniformColor = simpleShader->GetColorLocation();
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, &line->GetColor()[0]);
+		line->Render();
+
 
 		glUseProgram(0);
 

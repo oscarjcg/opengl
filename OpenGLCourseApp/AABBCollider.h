@@ -1,5 +1,6 @@
 #pragma once
 #include <glm\glm.hpp>
+#include "Line.h"
 
 class AABBCollider
 {
@@ -13,6 +14,7 @@ public:
 	void SetSize(int sizeX, int sizeY, int sizeZ);
 	bool Intersect(AABBCollider* b);
 	void CalculateLimits();
+	void CalculateColliderLines();
 
 	~AABBCollider();
 
@@ -26,6 +28,7 @@ public:
 	float maxY;
 	float minZ;
 	float maxZ;
+	Line* colliderLines;
 
 private:
 	

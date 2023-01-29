@@ -84,6 +84,7 @@ void CreateObjects()
 		0.0f, 1.0f, 0.0f
 	};
 	triangule->Create(vertices, indices, sizeof(vertices), sizeof(indices));
+	triangule->SetColor(glm::vec3(1.0f, 0.0f, 0.0f));
 
 	line = new Line();
 	GLfloat lineVertices[] = {
@@ -201,6 +202,8 @@ int main()
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		// ------------------- Shader -------------------
+
 		shaderList[0].UseShader();
 		uniformModel = shaderList[0].GetModelLocation();
 		uniformProjection = shaderList[0].GetProjectionLocation();
@@ -233,7 +236,7 @@ int main()
 			models[i]->RenderModel();
 		}
 
-
+		// ------------------- Simple shader -------------------
 		simpleShader->UseShader();
 
 		uniformModel = simpleShader->GetModelLocation();
@@ -249,16 +252,21 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
 		glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
-		glUniform3fv(uniformColor, 1, &glm::vec3(1.0f, 0.0f, 0.0f)[0]);
+		glUniform3fv(uniformColor, 1, &triangule->GetColor()[0]);
 
 		triangule->Render();
 
 		model = glm::mat4(1.0f);
 		uniformColor = simpleShader->GetColorLocation();
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		glUniform3fv(uniformColor, 1, &line->GetColor()[0]);
-		line->Render();
-
+		glUniform3fv(uniformColor, 1, &line->GetColor()[0]); 
+		//line->Render();
+		 
+		for (size_t i = 0; i < models.size(); i++)
+		{
+			glUniform3fv(uniformColor, 1, &models[i]->GetCollider()->colliderLines->GetColor()[0]);
+			models[i]->GetCollider()->colliderLines->Render();
+		}
 
 		glUseProgram(0);
 

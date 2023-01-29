@@ -1,5 +1,6 @@
 #pragma once
 #include <GL/glew.h>
+#include <glm\glm.hpp>
 
 class Triangule
 {
@@ -10,6 +11,8 @@ public:
 	void SetColor(glm::vec3 color) { this->color = color; }
 	glm::vec3 GetColor() { return color; }
 
+	void Clear();
+	~Triangule();
 private:
 	GLuint VBO, VAO, IBO;
 	unsigned int numOfIndices;

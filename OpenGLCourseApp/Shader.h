@@ -12,20 +12,13 @@
 #include "DirectionalLight.h"
 #include "PointLight.h"
 #include "SpotLight.h"
+#include "BaseShader.h"
 
-class Shader
+class Shader: public BaseShader
 {
 public:
 	Shader();
 
-	void CreateFromString(const char* vertexCode, const char* fragmentCode);
-	void CreateFromFiles(const char* vertexLocation, const char* fragmentLocation);
-
-	std::string ReadFile(const char* fileLocation);
-
-	GLuint GetProjectionLocation();
-	GLuint GetModelLocation();
-	GLuint GetViewLocation();
 	GLuint GetAmbientIntensityLocation();
 	GLuint GetAmbientColourLocation();
 	GLuint GetDiffuseIntensityLocation();
@@ -38,17 +31,13 @@ public:
 	void SetPointLights(PointLight * pLight, unsigned int lightCount);
 	void SetSpotLights(SpotLight * sLight, unsigned int lightCount);
 
-	void UseShader();
-	void ClearShader();
-
 	~Shader();
 
 private:
 	int pointLightCount;
 	int spotLightCount;
 
-	GLuint shaderID, uniformProjection, uniformModel, uniformView, uniformEyePosition,
-		uniformSpecularIntensity, uniformShininess;
+	GLuint uniformEyePosition, uniformSpecularIntensity, uniformShininess;
 
 	struct {
 		GLuint uniformColour;
@@ -88,6 +77,5 @@ private:
 	} uniformSpotLight[MAX_SPOT_LIGHTS];
 
 	void CompileShader(const char* vertexCode, const char* fragmentCode);
-	void AddShader(GLuint theProgram, const char* shaderCode, GLenum shaderType);
 };
 

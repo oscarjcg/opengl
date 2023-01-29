@@ -11,6 +11,8 @@ public:
 	void SetColor(glm::vec3 color) { this->color = color; }
 	glm::vec3 GetColor() { return color; }
 
+	void Clear();
+	~Line();
 private:
 	GLuint VBO, VAO, IBO;
 	unsigned int numOfIndices;

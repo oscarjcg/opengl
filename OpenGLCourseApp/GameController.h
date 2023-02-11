@@ -21,9 +21,9 @@ public:
 private:
 	std::vector<Model*> models;
 	const float toRadians = 3.14159265f / 180.0f;
-	const float limitX = 10.0f;
-	const float limitY = 10.0f;
-	const float limitZ = 10.0f;
+	const float limitX = 20.0f;
+	const float limitY = 20.0f;
+	const float limitZ = 20.0f;
 	
 	Camera* camera;
 

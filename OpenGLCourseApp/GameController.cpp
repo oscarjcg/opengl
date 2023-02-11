@@ -68,14 +68,14 @@ void GameController::CreateObjects()
 	floorModel = Model();
 	floorModel.LoadModel("Models/floor.obj");
 	floorModel.SetModel(glm::mat4(1.0f));
-	floorModel.Translate(glm::vec3(-1.0f, -1.0f, 0.0f));
+	//floorModel.Translate(glm::vec3(-1.0f, -1.0f, 0.0f));
 	//floorModel.Rotate(-90.0f * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
 	//floorModel.Scale(glm::vec3(0.4f, 0.4f, 0.4f));
 	floorModel.SetType(MODEL_ENVIRONMENT);
 	floorModel.SetDirection(glm::vec3(1.0f, 0.0f, 0.0f));
-	floorModel.SetPosition(glm::vec3(-1.0f, -1.0f, 0.0f));
+	//floorModel.SetPosition(glm::vec3(-1.0f, -1.0f, 0.0f));
 	floorModel.SetMoveSpeed(0.0f);
-	floorModel.SetCollider(0.0f, 0.0f, 0.0f);
+	floorModel.SetCollider(20.0f, 0.2f, 20.0f);
 
 	Model* bulletModel = new Model();
 	bulletModel->LoadModel("Models/Bullet.obj");
@@ -128,6 +128,7 @@ void GameController::CheckGameLimits(GLfloat deltaTime)
 
 void GameController::CheckColliders()
 {
+	std::vector<int> deleteModels;
 	for (size_t i = 0; i < models.size(); i++)
 	{
 		for (size_t j = i; j < models.size(); j++)
@@ -137,14 +138,31 @@ void GameController::CheckColliders()
 				models[i]->GetCollider()->Intersect(models[j]->GetCollider()))
 			{
 				printf("------------------Collider Intersect %d %d \n", i, j);
-				printf("Collider Intersect %f %f \n", 
-					models[i]->GetCollider()->maxX, models[j]->GetCollider()->maxX);
-				printf("Collider Intersect %f %f \n",
-					models[i]->GetCollider()->maxY, models[j]->GetCollider()->maxY);
-				printf("Collider Intersect %f %f \n",
-					models[i]->GetCollider()->maxX, models[j]->GetCollider()->maxZ);
+
+				if (std::find(deleteModels.begin(), deleteModels.end(), i) != deleteModels.end()) {
+					continue;
+				}
+
+				if (models[i]->GetType() == MODEL_BULLET)
+				{
+					deleteModels.push_back(i);
+				}
+				if (models[j]->GetType() == MODEL_BULLET)
+				{
+					deleteModels.push_back(j);
+				}
 			}
 
+		}
+	}
+
+	if (deleteModels.size() > 0) 
+	{
+		for (int i = deleteModels.size() - 1; i >= 0; i--)
+		{
+			printf("DELETED CheckColliders %i \n", i);
+			models[deleteModels[i]]->ClearModel();
+			models.erase(models.begin() + deleteModels[i]);
 		}
 	}
 }

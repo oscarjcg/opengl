@@ -11,7 +11,7 @@ public:
 
 	void SetPosition(glm::vec3 pos) { position = pos; }
 	glm::vec3 GetPosition() { return position; }
-	void SetSize(int sizeX, int sizeY, int sizeZ);
+	void SetSize(float sizeX, float sizeY, float sizeZ);
 	bool Intersect(AABBCollider* b);
 	void CalculateLimits();
 	void CalculateColliderLines();

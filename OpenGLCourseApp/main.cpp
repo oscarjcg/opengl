@@ -29,6 +29,7 @@
 #include "SimpleShader.h"
 #include "Triangule.h"
 #include "Line.h"
+#include "WorldAxis.h"
 
 
 
@@ -41,6 +42,7 @@ GameController gameController;
 Material shinyMaterial;
 Material dullMaterial;
 
+WorldAxis* worldAxis;
 Triangule* triangule;
 Line* line;
 
@@ -102,6 +104,8 @@ void CreateObjects()
 	
 	line->Create(lineVertices, lineIndices, sizeof(lineVertices), sizeof(lineIndices));
 	line->SetColor(glm::vec3(0.0f, 0.0f, 1.0f));
+
+	worldAxis = new WorldAxis();
 }
 
 void CreateLights()
@@ -167,7 +171,7 @@ int main()
 
 	gameController.init();
 	Camera camera;
-	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 5.0f, 0.5f);
+	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 10.0f, 0.5f);
 	gameController.setCamera(&camera);
 	
 	CreateObjects();
@@ -267,6 +271,10 @@ int main()
 			glUniform3fv(uniformColor, 1, &models[i]->GetCollider()->colliderLines->GetColor()[0]);
 			models[i]->GetCollider()->colliderLines->Render();
 		}
+
+		model = glm::mat4(1.0f);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		worldAxis->Render(uniformColor);
 
 		glUseProgram(0);
 

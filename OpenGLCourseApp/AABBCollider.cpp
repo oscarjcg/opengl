@@ -17,7 +17,7 @@ AABBCollider::AABBCollider()
 	colliderLines = new Line();
 }
 
-void AABBCollider::SetSize(int sizeX, int sizeY, int sizeZ)
+void AABBCollider::SetSize(float sizeX, float sizeY, float sizeZ)
 {
 	this->sizeX = sizeX;
 	this->sizeY = sizeY;

@@ -5,8 +5,8 @@ Model::Model()
 	// TODO Not working
 	model = glm::mat4(1.0f);
 	type = MODEL_ENVIRONMENT;
-	position = glm::vec3(0.0f, 0.0f, -1.0f);
-	direction = glm::vec3(0.0f, 0.0f, -1.0f);
+	position = glm::vec3(0.0f, 0.0f, 0.0f);
+	direction = glm::vec3(0.0f, 0.0f, 1.0f);
 	moveSpeed = 1.0f;
 }
 
@@ -146,6 +146,9 @@ void Model::ClearModel()
 			textureList[i] = nullptr;
 		}
 	}
+
+	delete collider;
+	collider = 0;
 }
 
 void Model::Translate(glm::vec3 values)

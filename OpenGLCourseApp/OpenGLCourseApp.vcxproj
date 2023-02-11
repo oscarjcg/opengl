@@ -173,6 +173,7 @@
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Triangule.cpp" />
     <ClCompile Include="Window.cpp" />
+    <ClCompile Include="WorldAxis.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AABBCollider.h" />
@@ -194,6 +195,7 @@
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Triangule.h" />
     <ClInclude Include="Window.h" />
+    <ClInclude Include="WorldAxis.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

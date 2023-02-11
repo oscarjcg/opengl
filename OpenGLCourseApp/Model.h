@@ -31,6 +31,7 @@ public:
 	void Scale(glm::vec3 values);
 	void SetModel(glm::mat4 value);
 	void SetType(int t);
+	int GetType() { return type; }
 	glm::mat4 GetModel();
 	void Update(GLfloat deltaTime);
 	void SetDirection(glm::vec3 dir) { direction = dir; }

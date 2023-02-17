@@ -40,6 +40,8 @@ public:
 	void SetMoveSpeed(GLfloat speed) { moveSpeed = speed; }
 	void SetCollider(float sizeX, float sizeY, float sizeZ);
 	AABBCollider* GetCollider() { return collider; }
+	void Bounce();
+	float CalculateAnglePlaneDirection(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3);
 
 	~Model();
 
@@ -60,5 +62,7 @@ private:
 	glm::vec3 direction;
 	GLfloat moveSpeed;
 	int type;
+	GLfloat yaw;
+	GLfloat pitch;
 };
 

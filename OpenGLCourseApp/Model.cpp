@@ -215,6 +215,65 @@ void Model::SetCollider(float sizeX, float sizeY, float sizeZ)
 	this->collider = collider;
 }
 
+void Model::Bounce()
+{
+	// Calculate angle
+	
+	glm::vec3 p1 = glm::vec3(collider->minX, collider->minY, collider->minZ);
+	glm::vec3 p2 = glm::vec3(collider->minX, collider->minY, collider->maxZ);
+	glm::vec3 p3 = glm::vec3(collider->maxX, collider->maxY, collider->minZ);
+	GLfloat angleY = CalculateAnglePlaneDirection(p1, p2, p3); // Plane xz
+
+	p1 = glm::vec3(collider->minX, collider->minY, collider->minZ);
+	p2 = glm::vec3(collider->minX, collider->maxY, collider->minZ);
+	p3 = glm::vec3(collider->maxX, collider->minY, collider->minZ);
+	GLfloat angleX = CalculateAnglePlaneDirection(p1, p2, p3); // Plane xy
+
+	yaw = angleX; // x axis
+	pitch = angleY; // y axis
+
+	if (direction.z < 0 && direction.x > 0)
+		yaw = -yaw;
+
+	if (direction.x < 0 && direction.z > 0)
+		yaw = 180.0f - yaw;
+
+	if (direction.x < 0 && direction.z < 0)
+		yaw = -180.0f + yaw;
+
+	printf("ANGLE yaw x %f \n", yaw);
+
+	// Calculate new direccion
+	direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	direction.y = sin(glm::radians(pitch));
+	direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	direction = glm::normalize(direction);
+
+}
+
+float Model::CalculateAnglePlaneDirection(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
+{
+	// Calculate plane equation (ax ,by, cz, k = 0) from 3 points
+	// Get vector p1p2 = p1 - p2 and p1p3 = p1 - p3
+	// Get normal = p1p2 x p1p3
+	// Equation: normal.x * x + normal.y * y + normal.z * z + k = 0
+
+	glm::vec3 p1p2 = glm::vec3(p1.x - p2.x, p1.y - p2.y, p1.z - p2.z);
+	glm::vec3 p1p3 = glm::vec3(p1.x - p3.x, p1.y - p3.y, p1.z - p3.z);
+	glm::vec3 normal = glm::normalize(glm::cross(p1p2, p1p3));
+
+	GLfloat k = -normal.x * p1.x - normal.y * p1.y - normal.z * p1.z;
+
+	// Calculate angle between plane and direction
+	GLfloat sineAngle =
+		abs(normal.x * direction.x + normal.y * direction.y + normal.z * direction.z) /
+		(sqrt(pow(normal.x, 2) + pow(normal.y, 2) + pow(normal.z, 2)) *
+			sqrt(pow(direction.x, 2) + pow(direction.y, 2) + pow(direction.z, 2))
+		);
+
+	return glm::degrees(asin(sineAngle));
+}
+
 Model::~Model()
 {
 }

@@ -75,6 +75,7 @@ void AABBCollider::CalculateColliderLines()
 		4, 5, // Upper axis
 		4, 6,
 		4, 7,
+		/*
 		5, 2, // Between axis
 		5, 3,
 		1, 6,
@@ -87,6 +88,7 @@ void AABBCollider::CalculateColliderLines()
 		5, 0,
 		0, 6,
 		5, 7
+		*/
 	};
 
 	

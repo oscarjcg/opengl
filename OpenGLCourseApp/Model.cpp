@@ -8,6 +8,7 @@ Model::Model()
 	position = glm::vec3(0.0f, 0.0f, 0.0f);
 	direction = glm::vec3(0.0f, 0.0f, 1.0f);
 	moveSpeed = 1.0f;
+	nBounces = 0;
 }
 
 void Model::RenderModel()
@@ -215,40 +216,68 @@ void Model::SetCollider(float sizeX, float sizeY, float sizeZ)
 	this->collider = collider;
 }
 
-void Model::Bounce()
+// TODO Review collision. Should be other object collider?
+void Model::Bounce(Model* other)
 {
-	// Calculate angle
+	if (nBounces > 1)
+		return;
 	
-	glm::vec3 p1 = glm::vec3(collider->minX, collider->minY, collider->minZ);
-	glm::vec3 p2 = glm::vec3(collider->minX, collider->minY, collider->maxZ);
-	glm::vec3 p3 = glm::vec3(collider->maxX, collider->maxY, collider->minZ);
-	GLfloat angleY = CalculateAnglePlaneDirection(p1, p2, p3); // Plane xz
 
-	p1 = glm::vec3(collider->minX, collider->minY, collider->minZ);
-	p2 = glm::vec3(collider->minX, collider->maxY, collider->minZ);
-	p3 = glm::vec3(collider->maxX, collider->minY, collider->minZ);
-	GLfloat angleX = CalculateAnglePlaneDirection(p1, p2, p3); // Plane xy
+	std::vector<glm::vec3> intersections;
+	// Get sides planes and line (Object position, direction)
 
-	yaw = angleX; // x axis
-	pitch = angleY; // y axis
+	glm::vec3 p1 = glm::vec3(other->collider->minX, other->collider->maxY, other->collider->minZ); // Top side
+	glm::vec3 p2 = glm::vec3(other->collider->minX, other->collider->maxY, other->collider->maxZ);
+	glm::vec3 p3 = glm::vec3(other->collider->maxX, other->collider->maxY, other->collider->minZ);
+	glm::vec3 intersectionPoint = CalculateIntersection(p1, p2, p3);
+	intersections.push_back(intersectionPoint);
+	
+	printf("top intersection  %f %f %f\n", intersectionPoint.x, intersectionPoint.y, intersectionPoint.z);
 
-	if (direction.z < 0 && direction.x > 0)
-		yaw = -yaw;
+	// TODO Intersection back wrong??
+	p1 = glm::vec3(other->collider->minX, other->collider->minY, other->collider->minZ); // Back side
+	p2 = glm::vec3(other->collider->minX, other->collider->maxY, other->collider->minZ);
+	p3 = glm::vec3(other->collider->maxX, other->collider->minY, other->collider->minZ);
+	intersectionPoint = CalculateIntersection(p1, p2, p3);
+	intersections.push_back(intersectionPoint);
 
-	if (direction.x < 0 && direction.z > 0)
-		yaw = 180.0f - yaw;
+	printf("back intersection  %f %f %f\n", intersectionPoint.x, intersectionPoint.y, intersectionPoint.z);
 
-	if (direction.x < 0 && direction.z < 0)
-		yaw = -180.0f + yaw;
+	// Distances from intersections to object
+	std::vector<GLfloat> distances;
 
-	printf("ANGLE yaw x %f \n", yaw);
+	int minIndex = 0;
+	float min = INT_MAX;
+	for (size_t i = 0; i < intersections.size(); i++)
+	{
+		float distance = CalculateDistance(position, intersections[i]);
+		distances.push_back(distance);
+		printf("distance  %f\n", distance);
+		if (min > distance) {
+			min = distance;
+			minIndex = i;
+		}
+	}
 
-	// Calculate new direccion
-	direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-	direction.y = sin(glm::radians(pitch));
-	direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-	direction = glm::normalize(direction);
 
+	// Get collision side
+	
+	switch (minIndex)
+	{
+		case COLLISION_TOP:
+			printf("------------------COLLISION_TOP \n");
+			CollisionTop();
+			break;
+		case COLLISION_BACK:
+			printf("------------------COLLISION_BACK \n");
+			CollisionBack();
+			break;
+		default:
+			break;
+	}
+	
+
+	nBounces++;
 }
 
 float Model::CalculateAnglePlaneDirection(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
@@ -272,6 +301,98 @@ float Model::CalculateAnglePlaneDirection(glm::vec3 p1, glm::vec3 p2, glm::vec3 
 		);
 
 	return glm::degrees(asin(sineAngle));
+}
+
+glm::vec3 Model::CalculateIntersection(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
+{
+	glm::vec3 p1p2 = glm::vec3(p1.x - p2.x, p1.y - p2.y, p1.z - p2.z);
+	glm::vec3 p1p3 = glm::vec3(p1.x - p3.x, p1.y - p3.y, p1.z - p3.z);
+	glm::vec3 normal = glm::normalize(glm::cross(p1p2, p1p3));
+
+	GLfloat k = -normal.x * p1.x - normal.y * p1.y - normal.z * p1.z;
+
+	// Intersection points with sides TODO check parallel error?
+	GLfloat t = (k - normal.x * position.x - normal.y * position.y - normal.z * position.z) /
+		(normal.x * position.x + normal.y * position.y + normal.z * position.z);
+
+	return glm::vec3(position.x + t * direction.x, position.y + t * direction.y, position.z + t * direction.z);
+}
+
+float Model::CalculateDistance(glm::vec3 p1, glm::vec3 p2)
+{
+	return sqrt((pow(p2.x - p1.x, 2) + pow(p2.y - p1.y, 2) + pow(p2.z - p1.z, 2)));
+}
+
+void Model::ApplyCollisionType(int type)
+{
+	
+}
+
+void Model::CollisionTop()
+{
+	// Calculate angle
+	glm::vec3 p1 = glm::vec3(collider->minX, collider->minY, collider->minZ);
+	glm::vec3 p2 = glm::vec3(collider->minX, collider->minY, collider->maxZ);
+	glm::vec3 p3 = glm::vec3(collider->maxX, collider->maxY, collider->minZ);
+	GLfloat angleY = CalculateAnglePlaneDirection(p1, p2, p3); // Plane xz
+
+	p1 = glm::vec3(collider->minX, collider->minY, collider->minZ);
+	p2 = glm::vec3(collider->minX, collider->maxY, collider->minZ);
+	p3 = glm::vec3(collider->maxX, collider->minY, collider->minZ);
+	GLfloat angleX = CalculateAnglePlaneDirection(p1, p2, p3); // Plane xy
+
+	yaw = angleX; // x axis
+	pitch = angleY; // y axis
+
+	if (direction.z < 0 && direction.x > 0)
+		yaw = -yaw;
+
+	if (direction.x < 0 && direction.z > 0)
+		yaw = 180.0f - yaw;
+
+	if (direction.x < 0 && direction.z < 0)
+		yaw = -180.0f + yaw;
+
+
+	printf("ANGLE yaw x %f \n", yaw);
+
+	// Calculate new direccion
+	direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	direction.y = sin(glm::radians(pitch));
+	direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	direction = glm::normalize(direction);
+}
+
+void Model::CollisionBack()
+{
+	glm::vec3 p1 = glm::vec3(collider->minX, collider->minY, collider->minZ);
+	glm::vec3 p2 = glm::vec3(collider->minX, collider->minY, collider->maxZ);
+	glm::vec3 p3 = glm::vec3(collider->maxX, collider->minY, collider->minZ); // TODO Check error in tio side!!
+	GLfloat angleY = CalculateAnglePlaneDirection(p1, p2, p3); // Plane xz
+
+	p1 = glm::vec3(collider->minX, collider->minY, collider->minZ);
+	p2 = glm::vec3(collider->minX, collider->maxY, collider->minZ);
+	p3 = glm::vec3(collider->maxX, collider->minY, collider->minZ);
+	GLfloat angleX = CalculateAnglePlaneDirection(p1, p2, p3); // Plane xy
+
+	yaw = -angleX; // x axis
+	pitch = angleY; // y axis
+
+	if (direction.y < 0)
+		pitch = -pitch;
+
+	if (direction.x < 0)
+		yaw = -180 + -yaw;
+
+
+	printf("ANGLE yaw x %f \n", yaw);
+	printf("ANGLE pitch y %f \n", pitch);
+
+	// Calculate new direccion
+	direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	direction.y = sin(glm::radians(pitch));
+	direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	direction = glm::normalize(direction);
 }
 
 Model::~Model()

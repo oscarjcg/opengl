@@ -84,11 +84,11 @@ void GameController::CreateObjects()
 	//bulletModel.Scale(glm::vec3(2000.0f, 2000.0f, 2000.0f));
 	bulletModel->SetType(MODEL_ENVIRONMENT);
 	bulletModel->SetDirection(glm::vec3(1.0f, 0.0f, 0.0f));
-	bulletModel->SetPosition(glm::vec3(5.0f, 2.0f, 10.0f));
+	bulletModel->SetPosition(glm::vec3(5.0f, 7.0f, 10.0f));
 	//bulletModel->SetDirection(glm::vec3(1.0f, 0.0f, 0.0f));
 	//bulletModel->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 	bulletModel->SetMoveSpeed(0.0f);
-	bulletModel->SetCollider(3.0f, 3.0f, 1.0f);
+	bulletModel->SetCollider(3.0f, 10.0f, 3.0f);
 
 
 	models.push_back(bulletModel);
@@ -137,19 +137,19 @@ void GameController::CheckColliders()
 			if (i != j && 
 				models[i]->GetCollider()->Intersect(models[j]->GetCollider()))
 			{
-				printf("------------------Collider Intersect %d %d \n", i, j);
+				//printf("------------------Collider Intersect %d %d \n", i, j);
 
 
 				if (models[i]->GetType() == MODEL_BULLET && models[j]->GetType() == MODEL_ENVIRONMENT)
 				{
-					printf("------------------Collider Bounce %d %d \n", i, j);
-					models[i]->Bounce();
+					//printf("------------------Collider Bounce %d %d \n", i, j);
+					models[i]->Bounce(models[j]);
 
 				}
 				if (models[i]->GetType() == MODEL_ENVIRONMENT && models[j]->GetType() == MODEL_BULLET)
 				{
-					printf("------------------Collider Bounce %d %d \n", i, j);
-					models[j]->Bounce();
+					//printf("------------------Collider Bounce %d %d \n", i, j);
+					models[j]->Bounce(models[i]);
 				}
 
 				/*
@@ -177,7 +177,7 @@ void GameController::CheckColliders()
 	{
 		for (int i = deleteModels.size() - 1; i >= 0; i--)
 		{
-			printf("DELETED CheckColliders %i \n", i);
+			//printf("DELETED CheckColliders %i \n", i);
 			models[deleteModels[i]]->ClearModel();
 			models.erase(models.begin() + deleteModels[i]);
 		}

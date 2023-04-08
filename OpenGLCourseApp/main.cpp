@@ -44,6 +44,7 @@ Material dullMaterial;
 
 WorldAxis* worldAxis;
 Triangule* triangule;
+Triangule* triangule2;
 Line* line;
 
 DirectionalLight mainLight;
@@ -72,6 +73,7 @@ void CreateObjects()
 	dullMaterial = Material(0.3f, 4);
 
 	triangule = new Triangule();
+	triangule2 = new Triangule();
 	unsigned int indices[] = {
 		0, 3, 1,
 		1, 3, 2,
@@ -87,6 +89,8 @@ void CreateObjects()
 	};
 	triangule->Create(vertices, indices, sizeof(vertices), sizeof(indices));
 	triangule->SetColor(glm::vec3(1.0f, 0.0f, 0.0f));
+	triangule2->Create(vertices, indices, sizeof(vertices), sizeof(indices));
+	triangule2->SetColor(glm::vec3(0.0f, 1.0f, 0.0f));
 
 	line = new Line();
 	GLfloat lineVertices[] = {
@@ -250,7 +254,11 @@ int main()
 		glm::mat4 model(1.0f);
 		model = glm::mat4(1.0f);
 
-		model = glm::translate(model, glm::vec3(triOffset2, 2.0f, -2.5f));
+		//model = glm::translate(model, glm::vec3(1.0f, 1.0f, 1.0f));
+		
+
+		if (models[models.size() - 1]->debugPoints.size() == 2)
+			model = glm::translate(model, models[models.size() - 1]->debugPoints[0]);
 		model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
 
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
@@ -259,6 +267,23 @@ int main()
 		glUniform3fv(uniformColor, 1, &triangule->GetColor()[0]);
 
 		triangule->Render();
+
+		model = glm::mat4(1.0f);
+
+		//model = glm::translate(model, glm::vec3(2.0f, 1.0f, 1.0f));
+		
+
+	
+		if (models[models.size() - 1]->debugPoints.size() == 2)
+			model = glm::translate(model, models[models.size() - 1]->debugPoints[1]);
+		model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, &triangule2->GetColor()[0]);
+		triangule2->Render();
+
+
+
 
 		model = glm::mat4(1.0f);
 		uniformColor = simpleShader->GetColorLocation();

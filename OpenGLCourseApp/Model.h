@@ -40,10 +40,21 @@ public:
 	void SetMoveSpeed(GLfloat speed) { moveSpeed = speed; }
 	void SetCollider(float sizeX, float sizeY, float sizeZ);
 	AABBCollider* GetCollider() { return collider; }
-	void Bounce();
+	void Bounce(Model* other);
 	float CalculateAnglePlaneDirection(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3);
+	glm::vec3 CalculateIntersection(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3);
+	float CalculateDistance(glm::vec3 p1, glm::vec3 p2);
+	void ApplyCollisionType(int type);
+	void CollisionTop();
+	void CollisionBack();
+	void CollisionLeft();
+	void CollisionRight();
+	void CollisionFront();
+	void CollisionBottom();
 
 	~Model();
+
+	std::vector<glm::vec3> debugPoints;
 
 private:
 
@@ -56,6 +67,7 @@ private:
 	std::vector<Texture*> textureList;
 	std::vector<unsigned int> meshToTex;
 	AABBCollider* collider;
+	
 
 	glm::mat4 model;
 	glm::vec3 position;
@@ -64,5 +76,7 @@ private:
 	int type;
 	GLfloat yaw;
 	GLfloat pitch;
+
+	int nBounces;
 };
 

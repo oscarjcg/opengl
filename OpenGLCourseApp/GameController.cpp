@@ -31,6 +31,23 @@ void GameController::Shoot()
 	
 }
 
+Model* GameController::AddPlayer(std::string name)
+{
+	Model* playerModel = new Model();
+	playerModel->LoadModel("Models/Cyborg.obj");
+	playerModel->SetModel(glm::mat4(1.0f));
+	playerModel->SetType(MODEL_PLAYER);
+	playerModel->SetDirection(glm::vec3(1.0f, 0.0f, 0.0f));
+	playerModel->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+	playerModel->Translate(playerModel->GetPosition());
+	playerModel->Scale(glm::vec3(0.2f, 0.2f, 0.2f));
+	playerModel->SetMoveSpeed(0.0f);
+	playerModel->SetCollider(1.0f, 1.0f, 1.0f);
+	playerModel->SetName(name);
+	models.push_back(playerModel);
+	return playerModel;
+}
+
 
 
 Camera* GameController::getCamera()
@@ -96,7 +113,6 @@ void GameController::CreateObjects()
 	//models.push_back(&xwing);
 	//models.push_back(&blackhawk);
 	models.push_back(&floorModel);
-	
 }
 
 void GameController::CheckGameLimits(GLfloat deltaTime)

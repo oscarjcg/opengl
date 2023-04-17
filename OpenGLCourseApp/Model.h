@@ -51,6 +51,8 @@ public:
 	void CollisionRight();
 	void CollisionFront();
 	void CollisionBottom();
+	void SetName(std::string newName) { name = newName; }
+	std::string GetName() { return name; }
 
 	~Model();
 
@@ -78,5 +80,7 @@ private:
 	GLfloat pitch;
 
 	int nBounces;
+
+	std::string name;
 };
 

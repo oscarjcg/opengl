@@ -9,6 +9,7 @@ Model::Model()
 	direction = glm::vec3(0.0f, 0.0f, 1.0f);
 	moveSpeed = 1.0f;
 	nBounces = 0;
+	name = "NoName";
 }
 
 void Model::RenderModel()
@@ -171,7 +172,7 @@ void Model::Scale(glm::vec3 values)
 void Model::SetModel(glm::mat4 value)
 {
 	model = value;
-	type = MODEL_BULLET;
+	//type = MODEL_BULLET;
 }
 
 void Model::SetType(int t)
@@ -198,9 +199,11 @@ void Model::Update(GLfloat deltaTime)
 	glm::vec3 newPos = glm::vec3(x, y, z);
 	position = newPos;
 
-	model = glm::mat4(1.0f);
-	if (type == MODEL_BULLET)
+	
+	if (type == MODEL_BULLET) {
+		model = glm::mat4(1.0f);
 		Translate(newPos);
+	}
 
 	collider->SetPosition(newPos);
 	collider->CalculateLimits();

@@ -5,6 +5,7 @@ const int MAX_SPOT_LIGHTS = 3;
 
 const int MODEL_ENVIRONMENT = 0;
 const int MODEL_BULLET = 1;
+const int MODEL_PLAYER = 2;
 
 const int COLLISION_TOP = 0;
 const int COLLISION_BACK = 1;

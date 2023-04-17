@@ -11,6 +11,7 @@ public:
 	GameController();
 	void init();
 	void Shoot();
+	Model* AddPlayer(std::string name);
 	std::vector<Model*> getModels() { return models; }
 	Camera* getCamera();
 	void setCamera(Camera* c) { camera = c; }

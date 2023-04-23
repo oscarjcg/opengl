@@ -85,6 +85,7 @@ const std::string JSON_DIRECTION = "direction";
 const std::string JSON_POSITION = "position";
 const std::string JSON_YAW = "yaw";
 const std::string JSON_PITCH = "pitch";
+const std::string JSON_TIME = "time";
 
 string currentPlayerId = "";
 
@@ -359,11 +360,13 @@ void CreateNodeClient()
 			string y = to_string(camera.getCameraPosition().y);
 			string z = to_string(camera.getCameraPosition().z);
 			string playerId = currentPlayerId;
+			string time = data->get_string();
 
 			string xField = getFieldJson(JSON_X, x);
 			string yField = getFieldJson(JSON_Y, y);
 			string zField = getFieldJson(JSON_Z, z);
 			string playerIdField = getFieldJson(JSON_PLAYER_ID, playerId);
+			string timeField = getFieldJson(JSON_TIME, time);
 
 			string directionField = getFieldJson(JSON_DIRECTION, getCameraDirectionJson());
 
@@ -373,8 +376,10 @@ void CreateNodeClient()
 			fields.push_back(zField);
 			fields.push_back(playerIdField);
 			fields.push_back(directionField);
+			fields.push_back(timeField);
 			cout << "getJsonObject " << getJsonObject(fields) << endl;
 
+			// TODO add timestamp
 			io.socket()->emit("newPosition", getJsonObject(fields));
 		})
 	);
@@ -426,6 +431,7 @@ int main()
 		// If a second has passed.
 		if (now - previousTime >= 1.0)
 		{
+			// TODO draw FPS indicator UI
 			/*
 			std::cout << "FPS ";
 			std::cout << frameCount;

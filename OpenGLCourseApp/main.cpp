@@ -31,7 +31,7 @@
 #include "Line.h"
 #include "WorldAxis.h"
 
-#include "C:\dev\cplusplus\siotest\vcpkg\packages\socket-io-client_x86-windows\include\sio_client.h"
+#include "C:\dev\dotnet\ExternalLibs\socket-io-client_x64-windows\include\sio_client.h"
 #include <iostream>
 
 #include "json/json.h"

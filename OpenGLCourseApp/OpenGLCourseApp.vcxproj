@@ -88,12 +88,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\ExternalLibs\GLEW\include;$(SolutionDir)\..\ExternalLibs\GLFW\include;$(SolutionDir)\..\ExternalLibs\GLM;$(SolutionDir)\..\ExternalLibs\ASSIMP\include;C:\dev\cplusplus\siotest\vcpkg\packages\jsoncpp_x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\ExternalLibs\GLEW\include;$(SolutionDir)\..\ExternalLibs\GLFW\include;$(SolutionDir)\..\ExternalLibs\GLM;$(SolutionDir)\..\ExternalLibs\ASSIMP\include;$(SolutionDir)\..\ExternalLibs\jsoncpp_x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)\..\ExternalLibs\GLEW\lib\Release\x64;$(SolutionDir)\..\ExternalLibs\GLFW\lib-vc2022;$(SolutionDir)\..\ExternalLibs\ASSIMP\lib;C:\dev\cplusplus\siotest\vcpkg\packages\socket-io-client_x64-windows\debug\lib;C:\dev\cplusplus\siotest\vcpkg\packages\jsoncpp_x64-windows\debug\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\ExternalLibs\GLEW\lib\Release\x64;$(SolutionDir)\..\ExternalLibs\GLFW\lib-vc2022;$(SolutionDir)\..\ExternalLibs\ASSIMP\lib;$(SolutionDir)\..\ExternalLibs\socket-io-client_x64-windows\debug\lib;$(SolutionDir)\..\ExternalLibs\jsoncpp_x64-windows\debug\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;assimp-vc143-mt.lib;sioclient.lib;sioclient_tls.lib;jsoncpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -104,12 +104,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\ExternalLibs\GLEW\include;$(SolutionDir)\..\ExternalLibs\GLFW\include;$(SolutionDir)\..\ExternalLibs\GLM;$(SolutionDir)\..\ExternalLibs\ASSIMP\include;C:\dev\cplusplus\siotest\vcpkg\packages\jsoncpp_x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\ExternalLibs\GLEW\include;$(SolutionDir)\..\ExternalLibs\GLFW\include;$(SolutionDir)\..\ExternalLibs\GLM;$(SolutionDir)\..\ExternalLibs\ASSIMP\include;$(SolutionDir)\..\ExternalLibs\jsoncpp_x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)\..\ExternalLibs\GLEW\lib\Release\x64;$(SolutionDir)\..\ExternalLibs\GLFW\lib-vc2022;$(SolutionDir)\..\ExternalLibs\ASSIMP\lib;C:\dev\cplusplus\siotest\vcpkg\packages\socket-io-client_x64-windows\debug\lib;C:\dev\cplusplus\siotest\vcpkg\packages\jsoncpp_x64-windows\debug\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\ExternalLibs\GLEW\lib\Release\x64;$(SolutionDir)\..\ExternalLibs\GLFW\lib-vc2022;$(SolutionDir)\..\ExternalLibs\ASSIMP\lib;$(SolutionDir)\..\ExternalLibs\socket-io-client_x64-windows\debug\lib;$(SolutionDir)\..\ExternalLibs\jsoncpp_x64-windows\debug\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;assimp-vc143-mt.lib;sioclient.lib;sioclient_tls.lib;jsoncpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -122,14 +122,14 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\ExternalLibs\GLEW\include;$(SolutionDir)\..\ExternalLibs\GLFW\include;$(SolutionDir)\..\ExternalLibs\GLM;$(SolutionDir)\..\ExternalLibs\ASSIMP\include;C:\dev\cplusplus\siotest\vcpkg\packages\jsoncpp_x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\ExternalLibs\GLEW\include;$(SolutionDir)\..\ExternalLibs\GLFW\include;$(SolutionDir)\..\ExternalLibs\GLM;$(SolutionDir)\..\ExternalLibs\ASSIMP\include;$(SolutionDir)\..\ExternalLibs\jsoncpp_x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)\..\ExternalLibs\GLEW\lib\Release\x64;$(SolutionDir)\..\ExternalLibs\GLFW\lib-vc2022;$(SolutionDir)\..\ExternalLibs\ASSIMP\lib;C:\dev\cplusplus\siotest\vcpkg\packages\socket-io-client_x64-windows\debug\lib;C:\dev\cplusplus\siotest\vcpkg\packages\jsoncpp_x64-windows\debug\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\ExternalLibs\GLEW\lib\Release\x64;$(SolutionDir)\..\ExternalLibs\GLFW\lib-vc2022;$(SolutionDir)\..\ExternalLibs\ASSIMP\lib;$(SolutionDir)\..\ExternalLibs\socket-io-client_x64-windows\debug\lib;$(SolutionDir)\..\ExternalLibs\jsoncpp_x64-windows\debug\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;assimp-vc143-mt.lib;sioclient.lib;sioclient_tls.lib;jsoncpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -142,14 +142,14 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\ExternalLibs\GLEW\include;$(SolutionDir)\..\ExternalLibs\GLFW\include;$(SolutionDir)\..\ExternalLibs\GLM;$(SolutionDir)\..\ExternalLibs\ASSIMP\include;C:\dev\cplusplus\siotest\vcpkg\packages\jsoncpp_x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\ExternalLibs\GLEW\include;$(SolutionDir)\..\ExternalLibs\GLFW\include;$(SolutionDir)\..\ExternalLibs\GLM;$(SolutionDir)\..\ExternalLibs\ASSIMP\include;$(SolutionDir)\..\ExternalLibs\jsoncpp_x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)\..\ExternalLibs\GLEW\lib\Release\x64;$(SolutionDir)\..\ExternalLibs\GLFW\lib-vc2022;$(SolutionDir)\..\ExternalLibs\ASSIMP\lib;C:\dev\cplusplus\siotest\vcpkg\packages\socket-io-client_x64-windows\debug\lib;C:\dev\cplusplus\siotest\vcpkg\packages\jsoncpp_x64-windows\debug\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\ExternalLibs\GLEW\lib\Release\x64;$(SolutionDir)\..\ExternalLibs\GLFW\lib-vc2022;$(SolutionDir)\..\ExternalLibs\ASSIMP\lib;$(SolutionDir)\..\ExternalLibs\socket-io-client_x64-windows\debug\lib;$(SolutionDir)\..\ExternalLibs\jsoncpp_x64-windows\debug\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;assimp-vc143-mt.lib;sioclient.lib;sioclient_tls.lib;jsoncpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

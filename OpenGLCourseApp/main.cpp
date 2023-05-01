@@ -327,8 +327,8 @@ string getCameraDirectionJson() {
 
 void CreateNodeClient()
 {
-	//io.connect("http://localhost:3000");
-	io.connect("http://opengl-node.oscarcatarigutierrez.com:3001");
+	io.connect("http://localhost:3001");
+	//io.connect("http://opengl-node.oscarcatarigutierrez.com:3001");
 
 
 	io.socket()->on("totalConnections", sio::socket::event_listener_aux(
@@ -376,12 +376,16 @@ void CreateNodeClient()
 			fields.push_back(yField);
 			fields.push_back(zField);
 			fields.push_back(playerIdField);
-			fields.push_back(directionField);
+			
 			fields.push_back(timeField);
 			cout << "getJsonObject " << getJsonObject(fields) << endl;
 
+			std::vector<string> fieldsDir;
+			fieldsDir.push_back(directionField);
+
 			// TODO add timestamp
 			io.socket()->emit("newPosition", getJsonObject(fields));
+			io.socket()->emit("newDirection", getJsonObject(fieldsDir));
 		})
 	);
 

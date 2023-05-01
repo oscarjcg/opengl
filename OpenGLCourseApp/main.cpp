@@ -327,7 +327,8 @@ string getCameraDirectionJson() {
 
 void CreateNodeClient()
 {
-	io.connect("http://localhost:3000");
+	//io.connect("http://localhost:3000");
+	io.connect("http://opengl-node.oscarcatarigutierrez.com:3001");
 
 
 	io.socket()->on("totalConnections", sio::socket::event_listener_aux(

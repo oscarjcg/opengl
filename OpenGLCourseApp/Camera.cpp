@@ -20,6 +20,7 @@ void Camera::keyControl(bool* keys, GLfloat deltaTime)
 {
 	GLfloat velocity = moveSpeed * deltaTime;
 
+	// Move
 	if (keys[GLFW_KEY_W])
 	{
 		position += front * velocity;
@@ -40,6 +41,42 @@ void Camera::keyControl(bool* keys, GLfloat deltaTime)
 		position += right * velocity;
 	}
 
+	GLfloat sensibility = 5;
+	// Aim
+	if (keys[GLFW_KEY_RIGHT])
+	{
+		yaw += velocity * sensibility;
+		update();
+	}
+
+	if (keys[GLFW_KEY_LEFT])
+	{
+		yaw -= velocity * sensibility;
+		update();
+	}
+
+	if (keys[GLFW_KEY_DOWN])
+	{
+		pitch -= velocity * sensibility;
+		update();
+	}
+
+	if (keys[GLFW_KEY_UP])
+	{
+		pitch += velocity * sensibility;
+		update();
+	}
+
+	// Shoot
+	/*
+	if (keys[GLFW_KEY_SPACE])
+	{
+		printf("GLFW_MOUSE_BUTTON_LEFT \n");
+		keysConsumed[GLFW_MOUSE_BUTTON_LEFT] = true;
+
+		actions->Shoot();
+	}
+	*/
 }
 
 void Camera::mouseControl(GameControllerActions* actions, 

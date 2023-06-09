@@ -53,6 +53,8 @@ public:
 	void CollisionBottom();
 	void SetName(std::string newName) { name = newName; }
 	std::string GetName() { return name; }
+	GLfloat GetYaw() { return yaw; }
+	GLfloat GetPitch() { return pitch; }
 
 	~Model();
 

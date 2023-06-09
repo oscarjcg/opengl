@@ -19,7 +19,7 @@ void GameController::Shoot()
 	bulletModel->SetModel(glm::mat4(1.0f));
 	//bulletModel->Translate(camera->getCameraPosition());
 	//bulletModel.Scale(glm::vec3(2000.0f, 2000.0f, 2000.0f));
-	bulletModel->SetType(MODEL_BULLET);
+	bulletModel->SetType(MODEL_BULLET_LOCAL);
 	bulletModel->SetDirection(camera->getCameraDirection());
 	bulletModel->SetPosition(camera->getCameraPosition());
 	//bulletModel->SetDirection(glm::vec3(1.0f, 0.0f, 0.0f));
@@ -31,7 +31,7 @@ void GameController::Shoot()
 	
 }
 
-Model* GameController::AddPlayer(std::string name)
+Model* GameController::AddRemotePlayer(std::string name)
 {
 	Model* playerModel = new Model();
 	playerModel->LoadModel("Models/Cyborg.obj");
@@ -48,7 +48,62 @@ Model* GameController::AddPlayer(std::string name)
 	return playerModel;
 }
 
+Model* GameController::AddRemoteBullet(std::string name)
+{
+	Model* bulletModel = new Model();
+	bulletModel->LoadModel("Models/Bullet.obj");
+	bulletModel->SetModel(glm::mat4(1.0f));
+	bulletModel->SetType(MODEL_BULLET_REMOTE);
+	bulletModel->SetDirection(camera->getCameraDirection());
+	bulletModel->SetPosition(camera->getCameraPosition());
+	bulletModel->SetMoveSpeed(0.0f);
+	bulletModel->SetCollider(1.0f, 1.0f, 1.0f);
 
+	models.push_back(bulletModel);
+	return bulletModel;
+}
+
+void GameController::ClearRemoteBullets() {
+	std::vector<int> deleteModels;
+
+	for (size_t i = 0; i < models.size(); i++)
+	{
+		if (models[i]->GetType() == MODEL_BULLET_REMOTE)
+		{
+			deleteModels.push_back(i);
+		}
+	}
+
+	if (deleteModels.size() > 0)
+	{
+		for (int i = deleteModels.size() - 1; i >= 0; i--)
+		{
+			models[deleteModels[i]]->ClearModel();
+			models.erase(models.begin() + deleteModels[i]);
+		}
+	}
+}
+
+void GameController::ClearRemotePlayer(std::string id) {
+	std::vector<int> deleteModels;
+
+	for (size_t i = 0; i < models.size(); i++)
+	{
+		if (models[i]->GetType() == MODEL_PLAYER && models[i]->GetName() == id)
+		{
+			deleteModels.push_back(i);
+		}
+	}
+
+	if (deleteModels.size() > 0)
+	{
+		for (int i = deleteModels.size() - 1; i >= 0; i--)
+		{
+			models[deleteModels[i]]->ClearModel();
+			models.erase(models.begin() + deleteModels[i]);
+		}
+	}
+}
 
 Camera* GameController::getCamera()
 {
@@ -156,13 +211,13 @@ void GameController::CheckColliders()
 				//printf("------------------Collider Intersect %d %d \n", i, j);
 
 
-				if (models[i]->GetType() == MODEL_BULLET && models[j]->GetType() == MODEL_ENVIRONMENT)
+				if (models[i]->GetType() == MODEL_BULLET_LOCAL && models[j]->GetType() == MODEL_ENVIRONMENT)
 				{
 					//printf("------------------Collider Bounce %d %d \n", i, j);
 					models[i]->Bounce(models[j]);
 
 				}
-				if (models[i]->GetType() == MODEL_ENVIRONMENT && models[j]->GetType() == MODEL_BULLET)
+				if (models[i]->GetType() == MODEL_ENVIRONMENT && models[j]->GetType() == MODEL_BULLET_LOCAL)
 				{
 					//printf("------------------Collider Bounce %d %d \n", i, j);
 					models[j]->Bounce(models[i]);

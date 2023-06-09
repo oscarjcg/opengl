@@ -200,7 +200,7 @@ void Model::Update(GLfloat deltaTime)
 	position = newPos;
 
 	
-	if (type == MODEL_BULLET) {
+	if (type == MODEL_BULLET_LOCAL) {
 		model = glm::mat4(1.0f);
 		Translate(newPos);
 	}

@@ -11,7 +11,10 @@ public:
 	GameController();
 	void init();
 	void Shoot();
-	Model* AddPlayer(std::string name);
+	Model* AddRemotePlayer(std::string name);
+	Model* AddRemoteBullet(std::string name);
+	void ClearRemoteBullets();
+	void ClearRemotePlayer(std::string id);
 	std::vector<Model*> getModels() { return models; }
 	Camera* getCamera();
 	void setCamera(Camera* c) { camera = c; }

@@ -36,6 +36,8 @@
 
 #include "json/json.h"
 #include <memory>
+#include "PlayerListRemote.h"
+#include "JsonUtils.h"
 
 
 using namespace sio;
@@ -71,26 +73,16 @@ static const char* vShader = "Shaders/shader.vert";
 // Fragment Shader
 static const char* fShader = "Shaders/shader.frag";
 
-float triOffset2 = 0.0f;
-
 Camera camera;
 
 sio::client io;
-
-const std::string JSON_X = "x";
-const std::string JSON_Y = "y";
-const std::string JSON_Z = "z";
-const std::string JSON_PLAYER_ID = "playerId";
-const std::string JSON_DIRECTION = "direction";
-const std::string JSON_POSITION = "position";
-const std::string JSON_YAW = "yaw";
-const std::string JSON_PITCH = "pitch";
-const std::string JSON_TIME = "time";
+JsonUtils jsonUtils;
 
 string currentPlayerId = "";
 
 
 string newPositions = "";
+string playerDisconnected = "";
 
 void CreateObjects() 
 {
@@ -210,132 +202,91 @@ int ParseJson(string rawJson, Json::Value& root) {
 }
 
 int ParseJsonPosition(string rawJson) {
-	Json::Value root;
-	if (ParseJson(rawJson, root) != 0) {
-		return EXIT_FAILURE;
-	}
+	
+	PlayerListRemote playerListRemote;
+	playerListRemote.Parse(rawJson);
 
-	std::cout << "size ";
-	std::cout << root.size();
-
-	Json::Value::Members members = root.getMemberNames();
-	for (int i = 0; i < members.size(); i++)
+	gameController.ClearRemoteBullets();
+	for (int i = 0; i < playerListRemote.playerListRemote.size(); i++)
 	{
-		cout << "root " << root[members[i]]["id"] << endl;
+		// TODO Memory leak?
+		PlayerDataRemote* playerDataRemote = playerListRemote.playerListRemote[i];
+		cout << "ParseJsonPosition " << playerDataRemote->id << endl;
 
-		Json::Value rootPosition;
-		Json::Value rootDirection;
-		if (ParseJson(root[members[i]][JSON_POSITION].asString(), rootPosition) == 0 &&
-			ParseJson(root[members[i]][JSON_DIRECTION].asString(), rootDirection) == 0) {
-			//cout << "pos: " << root[members[i]]["position"].asString() << endl;
+		// Player exits, update position
+		string playerId = playerDataRemote->id;
+			
+		bool found = false;
+		if (playerId != currentPlayerId) { // Only remote
+			float x = playerDataRemote->position.x;
+			float y = playerDataRemote->position.y;
+			float z = playerDataRemote->position.z;
+			glm::vec3 pos = glm::vec3(x, y, z);
 
-			// Player exits, update position
-			string playerId = root[members[i]]["id"].asString();
-			bool found = false;
-			if (playerId != currentPlayerId) {
-				float x = std::stof(rootPosition[JSON_X].asString());
-				float y = std::stof(rootPosition[JSON_Y].asString());
-				float z = std::stof(rootPosition[JSON_Z].asString());
-				glm::vec3 pos = glm::vec3(x, y, z);
+			x = playerDataRemote->direction.x;
+			y = playerDataRemote->direction.y;
+			z = playerDataRemote->direction.z;
+			glm::vec3 dir = glm::vec3(x, y, z);
+			float yaw = playerDataRemote->direction.yaw;
 
-				x = std::stof(rootDirection[JSON_X].asString());
-				y = std::stof(rootDirection[JSON_Y].asString());
-				z = std::stof(rootDirection[JSON_Z].asString());
-				glm::vec3 dir = glm::vec3(x, y, z);
-				float yaw = std::stof(rootDirection[JSON_YAW].asString());
-
-				std::vector<Model*> models = gameController.getModels();
-				for (size_t j = 0; j < models.size(); j++)
-				{
-					if (MODEL_PLAYER == models[j]->GetType() && models[j]->GetName() == playerId) {
-						found = true;
-						models[j]->SetPosition(pos);
-						models[j]->SetModel(glm::mat4(1.0f));
-						models[j]->Translate(models[j]->GetPosition());
-						const float toRadians = 3.14159265f / 180.0f; // TODO refactor
+			std::vector<Model*> models = gameController.getModels();
+			for (size_t j = 0; j < models.size(); j++)
+			{
+				if (MODEL_PLAYER == models[j]->GetType() && models[j]->GetName() == playerId) {
+					found = true;
+					models[j]->SetPosition(pos);
+					models[j]->SetModel(glm::mat4(1.0f));
+					models[j]->Translate(models[j]->GetPosition());
+					const float toRadians = 3.14159265f / 180.0f; // TODO refactor
 						
 						
-						models[j]->Rotate(yaw * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-						models[j]->Scale(glm::vec3(0.2f, 0.2f, 0.2f));
-						
-
-
-						//cout << "updated player " << endl;
-						break;
-					}
-				}
-
-				// Player does not exits, create and update position
-				if (!found) {
-					Model* model = gameController.AddPlayer(playerId);
-					model->SetPosition(pos);
-					model->SetModel(glm::mat4(1.0f));
-					model->Translate(model->GetPosition());
-					model->Scale(glm::vec3(0.2f, 0.2f, 0.2f));
-					//cout << "created new player " << playerId << endl;
+					models[j]->Rotate(yaw * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+					models[j]->Scale(glm::vec3(0.2f, 0.2f, 0.2f));
+					//cout << "updated player " << endl;
+					break;
 				}
 			}
-			
-			
+
+			// Player does not exits, create and update position
+			if (!found) {
+				Model* model = gameController.AddRemotePlayer(playerId);
+				model->SetPosition(pos);
+				model->SetModel(glm::mat4(1.0f));
+				model->Translate(model->GetPosition());
+				model->Scale(glm::vec3(0.2f, 0.2f, 0.2f));
+				//cout << "created new player " << playerId << endl;
+			}
+
+			// Bullets
+			for (int j = 0; j < playerDataRemote->bullets.size(); j++)
+			{
+				BulletData bullet = playerDataRemote->bullets[j];
+
+				glm::vec3 posBullet = glm::vec3(bullet.x, bullet.y, bullet.z);
+				Model* model = gameController.AddRemoteBullet(playerId);
+				model->SetPosition(posBullet);
+				model->SetModel(glm::mat4(1.0f));
+				model->Translate(model->GetPosition());
+			}
 		}
-		else {
-			//return EXIT_FAILURE;
-		}
+		
 	}
+
+
 	return 0;
-}
-
-string getFieldJson(string key, string value) {
-	return "\"" + key + "\":\"" + value + "\"";
-}
-
-string getJsonObject(std::vector<string> fields) {
-	string json = "{";
-
-	for (int i = 0; i < fields.size(); i++) {
-		json += fields[i];
-
-		if (i != fields.size() - 1)
-			json += ",";
-	}
-
-	json += "}";
-	return json;
-}
-
-string getCameraDirectionJson() {
-	string x = to_string(camera.getCameraDirection().x);
-	string y = to_string(camera.getCameraDirection().y);
-	string z = to_string(camera.getCameraDirection().z);
-	string yaw = to_string(camera.getYaw());
-	string pitch = to_string(camera.getPitch());
-	string xField = getFieldJson(JSON_X, x);
-	string yField = getFieldJson(JSON_Y, y);
-	string zField = getFieldJson(JSON_Z, z);
-	string yawField = getFieldJson(JSON_YAW, yaw);
-	string fieldField = getFieldJson(JSON_PITCH, pitch);
-
-	std::vector<string> fields;
-	fields.push_back(xField);
-	fields.push_back(yField);
-	fields.push_back(zField);
-	fields.push_back(yawField);
-	fields.push_back(fieldField);
-
-	return getJsonObject(fields);
 }
 
 void CreateNodeClient()
 {
-	io.connect("http://localhost:3001");
-	//io.connect("http://opengl-node.oscarcatarigutierrez.com:3001");
+	//io.connect("http://localhost:3001");
+	io.connect("http://opengl-node.oscarcatarigutierrez.com:3001");
 
 
 	io.socket()->on("totalConnections", sio::socket::event_listener_aux(
 		[&](string const& name, message::ptr const& data, bool isAck, message::list& ack_resp)
 		{
 			//int conn = data->get_map()["totalConections"]->get_int();
-			std::cout << data->get_int();
+			std::cout << "totalConnections " << data->get_int() << endl;
 		})
 	);
 
@@ -343,59 +294,36 @@ void CreateNodeClient()
 		[&](string const& name, message::ptr const& data, bool isAck, message::list& ack_resp)
 		{
 			//int conn = data->get_map()["totalConections"]->get_int();
-			std::cout << "playerId ";
-			std::cout << data->get_string();
+			std::cout << "playerId " << data->get_string() << endl;
 			currentPlayerId = data->get_string();
 		})
 	);
 
-
-	//currentPlayerId
-
-
 	io.socket()->on("yourPosition", sio::socket::event_listener_aux(
 		[&](string const& name, message::ptr const& data, bool isAck, message::list& ack_resp)
 		{
-			//std::cout << data->get_string();
-			string x = to_string(camera.getCameraPosition().x);
-			string y = to_string(camera.getCameraPosition().y);
-			string z = to_string(camera.getCameraPosition().z);
-			string playerId = currentPlayerId;
-			string time = data->get_string();
-
-			string xField = getFieldJson(JSON_X, x);
-			string yField = getFieldJson(JSON_Y, y);
-			string zField = getFieldJson(JSON_Z, z);
-			string playerIdField = getFieldJson(JSON_PLAYER_ID, playerId);
-			string timeField = getFieldJson(JSON_TIME, time);
-
-			string directionField = getFieldJson(JSON_DIRECTION, getCameraDirectionJson());
-
-			std::vector<string> fields;
-			fields.push_back(xField);
-			fields.push_back(yField);
-			fields.push_back(zField);
-			fields.push_back(playerIdField);
-			
-			fields.push_back(timeField);
-			cout << "getJsonObject " << getJsonObject(fields) << endl;
-
-			std::vector<string> fieldsDir;
-			fieldsDir.push_back(directionField);
-
-			// TODO add timestamp
-			io.socket()->emit("newPosition", getJsonObject(fields));
-			io.socket()->emit("newDirection", getJsonObject(fieldsDir));
+			string json = jsonUtils.getNewPositionJson(gameController.getModels(), camera, data->get_string(), currentPlayerId);
+			io.socket()->emit("newPosition", json);
 		})
 	);
-
 
 	io.socket()->on("updatePositions", sio::socket::event_listener_aux(
 		[&](string const& name, message::ptr const& data, bool isAck, message::list& ack_resp)
 		{
-			std::cout << "updatePositions ";
+			std::cout << "updatePositions " << endl;
 			//std::cout << data->get_string();
 			newPositions = data->get_string();
+		})
+	);
+
+
+	io.socket()->on("playerDisconnected", sio::socket::event_listener_aux(
+		[&](string const& name, message::ptr const& data, bool isAck, message::list& ack_resp)
+		{
+			// TODO Porblems if several at the same time?
+			std::cout << "playerDisconnected " + data->get_string() << endl;
+			//std::cout << data->get_string();
+			playerDisconnected = data->get_string();
 		})
 	);
 }
@@ -413,12 +341,10 @@ int main()
 	CreateLights();
 	CreateShaders();
 	CreateNodeClient();
-	//gameController.AddPlayer("localPlayer");
 
 
 	double previousTime = glfwGetTime();
 	int frameCount = 0;
-	
 
 	GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0, uniformEyePosition = 0,
 		uniformSpecularIntensity = 0, uniformShininess = 0;
@@ -460,6 +386,9 @@ int main()
 		if (newPositions != "") {
 			ParseJsonPosition(newPositions);
 			newPositions = "";
+		}
+		if (playerDisconnected != "") {
+			gameController.ClearRemotePlayer(playerDisconnected);
 		}
 
 		gameController.update(deltaTime);
